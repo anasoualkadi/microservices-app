@@ -1,0 +1,25 @@
+# Nom de l'application Spring Boot
+spring:
+  application:
+    name: customer-service
+  datasource:
+    url: jdbc:h2:mem:customers-db
+  h2:
+    console:
+      enabled: true
+  # Activation de l'enregistrement du service dans Eureka Server
+  cloud:
+    discovery:
+      enabled: true
+# Configuration des endpoints Actuator pour être exposés
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  # Affichage de plus de détails sur la santé à l'URL http://localhost:8081/actuator/health
+  endpoint:
+    health:
+      show-details: always
+server:
+  port: 8081
