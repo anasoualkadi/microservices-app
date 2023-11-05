@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: billing-service
+  server:
+    port: 8081
+  cloud:
+    discovery:
+      enabled: true
+  datasource:
+    #    docker run --name db -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=bills-db -e MYSQL_USER=admin -e MYSQL_PASSWORD=root -p 3306:3306 -d mysql:latest
+    url: jdbc:mysql://localhost:3306/bills-db?autoReconnect=true&allowPublicKeyRetrieval=true&useSSL=false
+    username: admin
+    password: root
+    driverClassName: com.mysql.cj.jdbc.Driver
+    initialization-mode: always
+  jpa:
+    hibernate:
+      ddl-auto: create

@@ -6,4 +6,7 @@ spring:
   cloud:
     discovery:
       enabled: true
-
+eureka:
+  client:
+    service-url:
+      defaultZone: http://discovery:8761/eureka/

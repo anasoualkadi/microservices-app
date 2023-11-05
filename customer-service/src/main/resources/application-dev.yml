@@ -1,0 +1,22 @@
+#  mvn clean install -Dspring.profiles.active=dev
+spring:
+  application:
+    name: customer-service
+  datasource:
+    url: jdbc:mysql://localhost:3306/customers-db?autoReconnect=true&allowPublicKeyRetrieval=true&useSSL=false
+    username: admin
+    password: root
+    driverClassName: com.mysql.cj.jdbc.Driver
+    initialization-mode: always
+  jpa:
+    hibernate:
+      ddl-auto: create
+  cloud:
+    discovery:
+      enabled: true
+server:
+  port: 8081
+eureka:
+  client:
+    service-url:
+      defaultZone: http://discovery:8761/eureka/

@@ -1,0 +1,23 @@
+#  mvn clean install -Dspring.profiles.active=dev
+spring:
+  application:
+    name: inventory-service
+  datasource:
+    #docker run --name products-db -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=products-db -e MYSQL_USER=admin -e MYSQL_PASSWORD=root -p 3307:3306 -d mysql:latest
+    url: jdbc:mysql://localhost:3307/products-db?autoReconnect=true&allowPublicKeyRetrieval=true&useSSL=false
+    username: admin
+    password: root
+    driverClassName: com.mysql.cj.jdbc.Driver
+    initialization-mode: always
+  jpa:
+    hibernate:
+      ddl-auto: create
+  cloud:
+    discovery:
+      enabled: true
+server:
+  port: 8082
+eureka:
+  client:
+    service-url:
+      defaultZone: http://discovery:8761/eureka/
