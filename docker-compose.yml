@@ -29,9 +29,9 @@ services:
 
   customer-db:
     image: mysql:latest
+    ports:
+      - "3309:3306"
     environment:
-      DATABASE_HOST: docker-mysql
-      DATABASE_PORT: 3306
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: customers-db
       MYSQL_USER: admin
@@ -52,12 +52,32 @@ services:
   inventory-db:
     image: mysql:latest
     ports:
-      - "3307:3306"
+      - "33010:3306"
     environment:
-      DATABASE_HOST: docker-mysql2
-      DATABASE_PORT: 3306
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: products-db
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: root
+
+  bill:
+    image: anasodev/billing-img:latest
+    ports:
+      - "8083:8083"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://bill-db:3306/bills-db?autoReconnect=true&allowPublicKeyRetrieval=true&useSSL=false
+      SPRING_DATASOURCE_USERNAME: admin
+      SPRING_DATASOURCE_PASSWORD: root
+    depends_on:
+      - bill-db
+      - discovery
+
+  bill-db:
+    image: mysql:latest
+    ports:
+      - "33011:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: bills-db
       MYSQL_USER: admin
       MYSQL_PASSWORD: root
 

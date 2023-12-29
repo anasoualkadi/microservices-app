@@ -2,21 +2,8 @@
 spring:
   application:
     name: customer-service
-  datasource:
-    url: jdbc:mysql://localhost:3306/customers-db?autoReconnect=true&allowPublicKeyRetrieval=true&useSSL=false
-    username: admin
-    password: root
-    driverClassName: com.mysql.cj.jdbc.Driver
-    initialization-mode: always
-  jpa:
-    hibernate:
-      ddl-auto: create
-  cloud:
-    discovery:
-      enabled: true
+  config:
+    import: optional:configserver:${CONFIG_SERVICE_URL:http://localhost:9999}
 server:
   port: 8081
-eureka:
-  client:
-    service-url:
-      defaultZone: http://discovery:8761/eureka/
+
