@@ -15,3 +15,7 @@ buildNumber.properties
 .project
 # JDT-specific (Eclipse Java Development Tools)
 .classpath
+/config-repo/.idea/aws.xml
+/config-repo/.idea/misc.xml
+/config-repo/.idea/modules.xml
+/config-repo/.idea/vcs.xml
