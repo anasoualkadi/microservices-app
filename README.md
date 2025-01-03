@@ -14,7 +14,7 @@ L'architecture de ce projet est composée des éléments suivants :
 ### 2. **Gateway**
    - **Point d'entrée** de toutes les requêtes externes.
    - **Rôle** : Redirige les requêtes vers les microservices appropriés en utilisant le nom du service récupéré via Eureka.
-   - **URL d'accès** : [http://localhost:8888/{nom du service}/{chemin dans controller}](http://localhost:8888/{nom du service}/{chemin dans controller})
+   - **URL d'accès** : [http://localhost:8888/{nom du service}/{chemin dans controller}]
    - **Fonctionnement** :
      - La Gateway interroge le serveur Eureka pour résoudre dynamiquement les routes des microservices.
      - Par exemple : une requête vers `http://localhost:8888/CUSTOMER-SERVICE/customers/getCustomers` sera automatiquement redirigée vers le service approprié basé sur son nom dans Eureka.
@@ -37,14 +37,16 @@ L'architecture de ce projet est composée des éléments suivants :
    - **Inventory Service** : Gestion de l'inventaire des produits.
    - **Billing Service** : Gestion de la facturation et communication avec les autres services via **Feign**.
 
+   ![MCD du Projet](MCD.png)
+
+
 ## Utilisation de **Feign**
 
 **Feign** est un client HTTP déclaratif, simplifiant la communication entre microservices. Dans ce projet, il est utilisé par le **Billing Service** pour interagir avec les services **Customer** et **Inventory** de manière transparente et facile à maintenir.
 
 - **Avantages de Feign** :
   - Simplifie l'écriture des clients HTTP.
-  - Intégration native avec Spring Cloud et **Ribbon** pour le load balancing.
-
+  - Intégration native avec Spring Cloud.
 ## Comment démarrer le projet
 
 Pour démarrer ce projet en local :
