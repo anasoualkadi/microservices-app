@@ -2,33 +2,71 @@ version: '3.8'
 #------------------------------ A REVOIR -------------------------
 services:
   discovery:
-    image: anasodev/discovery-img
+    image: anasodev/discovery-service-dev:1.0
     ports:
       - "8761:8761"
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8761/actuator/health" ]
+      interval: 10s
+      retries: 4
+    restart: always
+
+  config:
+    image: anasodev/config-service-dev:1.0
+    ports:
+      - '9999:9999'
+    expose:
+      - '9999'
+    environment:
+      - DISCOVERY_SERVICE_URL=http://discovery:8761/eureka/
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:9999/actuator/health" ]
+      interval: 10s
+      retries: 4
+    depends_on:
+      discovery:
+        condition: service_healthy
+    restart: always
 
   gateway:
-    image: anasodev/gateway-img:dev
+    image: anasodev/gateway-service-dev:1.0
     ports:
       - "8888:8888"
     depends_on:
-      - discovery
+      config:
+        condition: service_healthy
     environment:
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery:8761/eureka/
+      - DISCOVERY_SERVICE_URL=http://discovery:8761/eureka/
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8888/actuator/health" ]
+      interval: 10s
+      retries: 4
+    restart: always
 
   customer:
-    image: anasodev/customer-img:latest
+    image: anasodev/customer-service-dev:1.0
     ports:
       - "8081:8081"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://customer-db:3306/customers-db?autoReconnect=true&allowPublicKeyRetrieval=true&useSSL=false
-      SPRING_DATASOURCE_USERNAME: admin
-      SPRING_DATASOURCE_PASSWORD: root
+      - CONFIG_SERVICE_URL=http://config:9999
+      - DISCOVERY_SERVICE_URL=http://discovery:8761/eureka/
+      - CONFIG_SERVICE_URL=http://enset-ebank-config-service:9999
+      - SPRING_DATASOURCE_URL=jdbc:mysql://customer-db:3306/customers-db?autoReconnect=true&allowPublicKeyRetrieval=true&useSSL=false
+      - SPRING_DATASOURCE_USERNAME=admin
+      - SPRING_DATASOURCE_PASSWORD=root
     depends_on:
-      - customer-db
-      - discovery
+      customer-db:
+        condition: service_healthy
+      gateway:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8081/actuator/health" ]
+      interval: 10s
+      retries: 4
+    restart: always
 
   customer-db:
-    image: mysql:latest
+    image: mysql:8.0
     ports:
       - "3309:3306"
     environment:
@@ -36,21 +74,35 @@ services:
       MYSQL_DATABASE: customers-db
       MYSQL_USER: admin
       MYSQL_PASSWORD: root
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "--silent" ]
+      interval: 10s
+      retries: 4
+    restart: always
 
   inventory:
-    image: anasodev/inventory-img:latest
+    image: anasodev/inventory-service-dev:1.0
     ports:
       - "8082:8082"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://inventory-db:3306/products-db?autoReconnect=true&allowPublicKeyRetrieval=true&useSSL=false
-      SPRING_DATASOURCE_USERNAME: admin
-      SPRING_DATASOURCE_PASSWORD: root
+      - CONFIG_SERVICE_URL=http://config:9999
+      - DISCOVERY_SERVICE_URL=http://discovery:8761/eureka/
+      - SPRING_DATASOURCE_URL=jdbc:mysql://inventory-db:3306/products-db?autoReconnect=true&allowPublicKeyRetrieval=true&useSSL=false
+      - SPRING_DATASOURCE_USERNAME=admin
+      - SPRING_DATASOURCE_PASSWORD=root
     depends_on:
-      - inventory-db
-      - discovery
+      customer:
+        condition: service_healthy
+      inventory-db:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8082/actuator/health" ]
+      interval: 10s
+      retries: 4
+    restart: always
 
   inventory-db:
-    image: mysql:latest
+    image: mysql:8.0
     ports:
       - "33010:3306"
     environment:
@@ -58,21 +110,36 @@ services:
       MYSQL_DATABASE: products-db
       MYSQL_USER: admin
       MYSQL_PASSWORD: root
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "--silent" ]
+      interval: 10s
+      retries: 4
+    restart: always
 
   bill:
-    image: anasodev/billing-img:latest
+    image: anasodev/billing-service-dev:1.0
     ports:
       - "8083:8083"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://bill-db:3306/bills-db?autoReconnect=true&allowPublicKeyRetrieval=true&useSSL=false
-      SPRING_DATASOURCE_USERNAME: admin
-      SPRING_DATASOURCE_PASSWORD: root
+      - CONFIG_SERVICE_URL=http://config:9999
+      - DISCOVERY_SERVICE_URL=http://discovery:8761/eureka/
+      - SPRING_DATASOURCE_URL=jdbc:mysql://bill-db:3306/bills-db?autoReconnect=true&allowPublicKeyRetrieval=true&useSSL=false
+      - SPRING_DATASOURCE_USERNAME=admin
+      - SPRING_DATASOURCE_PASSWORD=root
     depends_on:
-      - bill-db
-      - discovery
+      inventory:
+        condition: service_healthy
+      bill-db:
+        condition: service_healthy
+
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8083/actuator/health" ]
+      interval: 10s
+      retries: 4
+    restart: always
 
   bill-db:
-    image: mysql:latest
+    image: mysql:8.0
     ports:
       - "33011:3306"
     environment:
@@ -80,4 +147,9 @@ services:
       MYSQL_DATABASE: bills-db
       MYSQL_USER: admin
       MYSQL_PASSWORD: root
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "--silent" ]
+      interval: 10s
+      retries: 4
+    restart: always
 
