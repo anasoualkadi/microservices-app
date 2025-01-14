@@ -1,7 +1,8 @@
 version: '3.8'
 services:
   discovery:
-    image: anasodev/discovery-service-dev:1.0
+    build: ./discovery-service
+    container_name: discovery
     ports:
       - "8761:8761"
     healthcheck:
@@ -11,7 +12,8 @@ services:
     restart: always
 
   config:
-    image: anasodev/config-service-dev:5.0
+    build: ./config-service
+    container_name: config
     ports:
       - '9999:9999'
     depends_on:
@@ -26,7 +28,8 @@ services:
     restart: always
 
   gateway:
-    image: anasodev/gateway-service-dev:1.0
+    build: ./gateway
+    container_name: gateway
     ports:
       - "8888:8888"
     depends_on:
@@ -41,7 +44,8 @@ services:
     restart: always
 
   customer:
-    image: anasodev/customer-service-dev:1.0
+    build: ./customer-service
+    container_name: customer
     ports:
       - "8081:8081"
     environment:
@@ -77,7 +81,8 @@ services:
     restart: always
 
   inventory:
-    image: anasodev/inventory-service-dev:1.0
+    build: ./inventory-service
+    container_name: inventory
     ports:
       - "8082:8082"
     environment:
@@ -113,7 +118,8 @@ services:
     restart: always
 
   bill:
-    image: anasodev/billing-service-dev:1.0
+    build: ./billing-service
+    container_name: bill
     ports:
       - "8083:8083"
     environment:
