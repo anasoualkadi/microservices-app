@@ -1,5 +1,4 @@
 version: '3.8'
-#------------------------------ A REVOIR -------------------------
 services:
   discovery:
     image: anasodev/discovery-service-dev:1.0
@@ -12,20 +11,18 @@ services:
     restart: always
 
   config:
-    image: anasodev/config-service-dev:1.0
+    image: anasodev/config-service-dev:5.0
     ports:
       - '9999:9999'
-    expose:
-      - '9999'
+    depends_on:
+      discovery:
+        condition: service_healthy
     environment:
       - DISCOVERY_SERVICE_URL=http://discovery:8761/eureka/
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:9999/actuator/health" ]
       interval: 10s
       retries: 4
-    depends_on:
-      discovery:
-        condition: service_healthy
     restart: always
 
   gateway:
@@ -50,7 +47,6 @@ services:
     environment:
       - CONFIG_SERVICE_URL=http://config:9999
       - DISCOVERY_SERVICE_URL=http://discovery:8761/eureka/
-      - CONFIG_SERVICE_URL=http://enset-ebank-config-service:9999
       - SPRING_DATASOURCE_URL=jdbc:mysql://customer-db:3306/customers-db?autoReconnect=true&allowPublicKeyRetrieval=true&useSSL=false
       - SPRING_DATASOURCE_USERNAME=admin
       - SPRING_DATASOURCE_PASSWORD=root
